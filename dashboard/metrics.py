@@ -1,8 +1,6 @@
 import pandas as pd
 import logging
 
-from preprocessing import *
-
 def calculate_avg(df, column):
     avg = df[column].mean()
     return avg

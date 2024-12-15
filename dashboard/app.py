@@ -4,7 +4,6 @@ import pandas as pd
 from data import *
 from metrics import *
 from charts import *
-from preprocessing import *
 
 filter_7d_df = filter_7d_data(weather_df)
 
@@ -25,12 +24,19 @@ with tab1:
         with col1:
             st.header('Historical Weather Report')
         with col2:
-            s_col1, s_col2 = st.columns([0.5, 0.5])
-            with s_col1:
-                tod_select_box = st.selectbox('Times of Day', list_times_of_day)
+            s_col1, s_col2, s_col3 = st.columns([0.2, 0.4, 0.4])
             with s_col2:
+                tod_select_box = st.selectbox('Times of Day', list_times_of_day)
+            with s_col3:
                 month_day_select_box = st.selectbox('Date (recent 7 days)', list_month_day)
-
+            with s_col1:
+                if tod_select_box == 'Day':
+                    st.image('../icon/sun.png', use_column_width=True)
+                elif tod_select_box == 'Night':
+                    st.image('../icon/moon.png', use_column_width=True)
+                else:
+                    st.image('../icon/day-and-night.png', use_column_width=True)
+                
     if tod_select_box != 'All':
         filter_7d_df = filter_7d_df[filter_7d_df['time_of_day'] == tod_select_box]   
 
