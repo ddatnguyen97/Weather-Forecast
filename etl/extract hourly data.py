@@ -17,13 +17,14 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 
 API_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-DATE_RANGE = {"start_date": "2022-01-01", "end_date": "2024-12-10"}
+DATE_RANGE = {"start_date": "2022-01-01", "end_date": "2024-12-14"}
 HOURLY_VARIABLES = [
         "temperature_2m",
         "relative_humidity_2m",
         "dew_point_2m",
         "apparent_temperature", 
-        "precipitation_probability", 
+        "precipitation_probability",
+        "precipitation",
         "rain", 
         "showers",
         "weather_code", 
@@ -36,12 +37,12 @@ HOURLY_VARIABLES = [
         "wind_speed_80m", 
         "wind_direction_80m", 
         "wind_gusts_10m", 
-        "temperature_80m", 
         "uv_index", 
         "uv_index_clear_sky", 
         "is_day", 
-        "sunshine_duration"
+        "sunshine_duration",
     ]
+# TIME_ZONE = "Auto"
 
 db_config = {
     'username': os.getenv('DB_USER'),
@@ -58,7 +59,8 @@ def fetch_weather_data():
             **LOCATION,
             **DATE_RANGE,
             "hourly": HOURLY_VARIABLES,
-            "cell_selection": "nearest"
+            "cell_selection": "nearest",
+            # "timezone": TIME_ZONE,
         }
         response = openmeteo.weather_api(API_URL, params=params)[0]
         logging.info(f"Data fetched for coordinates: {response.Latitude()}°N, {response.Longitude()}°E")
@@ -90,7 +92,6 @@ def transform_data(df):
     try:
         df['weather_code'] = df['weather_code'].fillna(df['weather_code'].mode()[0])
         df['is_day'] = df['is_day'].fillna(df['is_day'].mode()[0])
-
         df['date_id'] = df['date'].dt.strftime('%Y%m%d')
         df['time_id'] = df['date'].dt.strftime('%H%M')
         df['weather_code'] = df['weather_code'].astype(int).apply(lambda x: f"{x:02d}")
@@ -125,5 +126,5 @@ def execute_pipeline(table_name):
         raise
 
 if __name__ == '__main__':
-    table_name = 'hcm_weather'
+    table_name = 'hourly_data'
     df = execute_pipeline(table_name)

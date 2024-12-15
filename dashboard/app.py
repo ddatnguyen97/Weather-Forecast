@@ -15,14 +15,26 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="auto"
     )
+
+st.markdown(
+    """
+    <style>
+    .stApp {
+        background-color: #2F3030;  /* Change this to your desired background color */
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.image('../icon/hcmc-1.jpg', use_column_width=True)
 st.title('HCM City Weather Dashboard')
-tab1, tab2 = st.tabs(['Historical Report', 'Future Prediction'])
+tab1, tab2 = st.tabs(['7 Days Report', 'Future Prediction'])
 with tab1:
     with st.container():
         col1, col2 = st.columns([0.6, 0.4])
         with col1:
-            st.header('Historical Weather Report')
+            st.header('7 Days Weather Report')
         with col2:
             s_col1, s_col2, s_col3 = st.columns([0.2, 0.4, 0.4])
             with s_col2:

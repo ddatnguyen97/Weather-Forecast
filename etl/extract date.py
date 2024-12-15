@@ -69,6 +69,6 @@ def execute_pipeline(sd, ed, table_name, connection_string):
 
 if __name__ == '__main__':
     table_name = 'dim_date'
-    start_date = '2020-01-01'
+    start_date = '2022-01-01'
     end_date = '2024-12-31'
     execute_pipeline(start_date, end_date, table_name, connection_string)

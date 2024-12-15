@@ -1,4 +1,4 @@
-CREATE TABLE "hcm_weather" (
+CREATE TABLE "hourly_data" (
   "id" varchar(20),
   "date_id" varchar(10),
   "time_id" varchar(10),
@@ -7,6 +7,7 @@ CREATE TABLE "hcm_weather" (
   "dew_point_2m" numeric,
   "apparent_temperature" numeric,
   "precipitation_probability" numeric,
+  "precipitation" numeric,
   "rain" numeric,
   "showers" numeric,
   "weather_code" varchar(10),
@@ -19,7 +20,6 @@ CREATE TABLE "hcm_weather" (
   "wind_speed_80m" numeric,
   "wind_direction_80m" numeric,
   "wind_gusts_10m" numeric,
-  "temperature_80m" numeric,
   "uv_index" numeric,
   "uv_index_clear_sky" numeric,
   "is_day" varchar(10),
@@ -51,10 +51,10 @@ CREATE TABLE "dim_time" (
   "hour" int
 );
 
-ALTER TABLE "hcm_weather" ADD FOREIGN KEY ("weather_code") REFERENCES "weather_code" ("id");
+ALTER TABLE "hourly_data" ADD FOREIGN KEY ("weather_code") REFERENCES "weather_code" ("id");
 
-ALTER TABLE "hcm_weather" ADD FOREIGN KEY ("is_day") REFERENCES "times_of_day" ("id");
+ALTER TABLE "hourly_data" ADD FOREIGN KEY ("is_day") REFERENCES "times_of_day" ("id");
 
-ALTER TABLE "hcm_weather" ADD FOREIGN KEY ("date_id") REFERENCES "dim_date" ("id");
+ALTER TABLE "hourly_data" ADD FOREIGN KEY ("date_id") REFERENCES "dim_date" ("id");
 
-ALTER TABLE "hcm_weather" ADD FOREIGN KEY ("time_id") REFERENCES "dim_time" ("id");
+ALTER TABLE "hourly_data" ADD FOREIGN KEY ("time_id") REFERENCES "dim_time" ("id");

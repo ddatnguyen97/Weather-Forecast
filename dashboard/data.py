@@ -57,7 +57,7 @@ def execute_data_code(query, columns):
 
 query = text("""
     select 
-        hW.*,
+        hw.*,
         dd.date,
         dd.quarter,
         dd.year,
@@ -67,7 +67,7 @@ query = text("""
         tod.name as time_of_day,
         wc.name as weather_code_name   
     from
-        hcm_weather hw 
+        hourly_data hw 
     join
         dim_date dd on hw.date_id = dd.id
     join
@@ -89,9 +89,9 @@ weather_df = execute_data_code(query, columns_to_drop)
 
 numeric_columns = [
     'temperature_2m', 'relative_humidity_2m', 'dew_point_2m', 'apparent_temperature',
-    'precipitation_probability', 'rain', 'showers', 'pressure_msl', 'surface_pressure',
+    'precipitation_probability', 'precipitation', 'rain', 'showers', 'pressure_msl', 'surface_pressure',
     'cloud_cover', 'visibility', 'evapotranspiration', 'vapour_pressure_deficit', 
-    'wind_speed_80m', 'wind_direction_80m', 'wind_gusts_10m', 'temperature_80m', 
+    'wind_speed_80m', 'wind_direction_80m', 'wind_gusts_10m', 
     'uv_index', 'uv_index_clear_sky', 'sunshine_duration'
 ]
 for col in numeric_columns:
