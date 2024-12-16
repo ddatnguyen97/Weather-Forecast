@@ -58,17 +58,17 @@ with tab1:
     metrics = calculate_metrics(filter_7d_df)
 
     avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
-    temperature_chart = create_line_chart(avg_temp_by_day_hour, x='time', y='temperature_2m', title='Average Temperature by Day', color='month_day')
+    temperature_chart = create_line_chart(avg_temp_by_day_hour, x='time', y='temperature_2m', title='Average Temperature by Hour', color='month_day')
 
     sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
     sunshine_duration_chart = create_area_chart(sunshine_duration_by_day_hour, x='time', y='sunshine_duration', title='Average Sunshine Duration by Hour', color='month_day')
     sunshine_duration_chart.update_layout(height=500)
 
     wind_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['wind_speed_80m', 'wind_gusts_10m']].mean().reset_index()
-    wind_chart = create_line_chart(wind_data_by_day, x='time', y=['wind_speed_80m', 'wind_gusts_10m'], title='Wind Speed and Gust by Day', color='month_day')
+    wind_chart = create_line_chart(wind_data_by_day, x='time', y=['wind_speed_80m', 'wind_gusts_10m'], title='Wind Speed and Gust by Hour', color='month_day')
 
     rainfall_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['precipitation', 'rain', 'showers']].mean().reset_index()
-    rainfall_chart = create_bar_chart(rainfall_data_by_day, x='time', y=['precipitation', 'rain', 'showers'], title='Rainfall by Day', color='month_day')
+    rainfall_chart = create_bar_chart(rainfall_data_by_day, x='time', y=['precipitation', 'rain', 'showers'], title='Rainfall by Hour', color='month_day')
 
     avg_uv_index_chart = create_gauge_chart(metrics['avg_uv_index'], 'AVG UV Index (mW/cm2)')
     avg_uv_index_chart.update_layout(height=240)
