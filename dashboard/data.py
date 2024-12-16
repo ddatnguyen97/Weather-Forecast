@@ -115,9 +115,26 @@ def get_wind_direction(deg):
     else:
         return 'NW'
 
+def get_comfort_index(dew_point):
+    if dew_point < 4.4:
+        return "Very Dry"
+    elif 4.4 <= dew_point < 10:
+        return "Dry"
+    elif 10 <= dew_point < 15.5:
+        return "Comfortable"
+    elif 15.5 <= dew_point < 18.3:
+        return "Slightly Humid"
+    elif 18.3 <= dew_point < 21.1:
+        return "Humid"
+    elif 21.1 <= dew_point < 23.9:
+        return "Very Humid"
+    else:
+        return "Extremely Humid" 
+
 weather_df['date'] = pd.to_datetime(weather_df['date'])
 weather_df['month_day'] = weather_df['date'].dt.strftime('%m-%d')
 weather_df['wind_direction'] = weather_df['wind_direction_80m'].apply(get_wind_direction)
+weather_df['comfort_index'] = weather_df['dew_point_2m'].apply(get_comfort_index)
 
 def filter_7d_data(df, days=6):
     max_date = df['date'].max()
