@@ -176,7 +176,7 @@ with tab1:
         with col1:
             s_col1, s_col2 = st.columns([0.2, 0.8])
             with s_col1:
-                st.image('../icon/disdrometer.png', use_column_width=True)
+                st.image('../icon/rainfall.png', use_column_width=True)
             with s_col2:
                 st.metric(label='Average Precipitation', value=metrics['avg_precipitation'])
         with col2:
