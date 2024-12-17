@@ -1,6 +1,8 @@
 import pandas as pd
 import logging
 
+from data import *
+
 def calculate_avg(df, column):
     avg = df[column].mean()
     return avg
@@ -65,3 +67,5 @@ def calculate_metrics(df):
         "avg_vapour_pressure_deficit": f'{avg_vapour_pressure_deficit:.2f} hPa',
         "comfort_index": comfort_level,
     }
+
+metrics = calculate_metrics(filter_7d_df)
