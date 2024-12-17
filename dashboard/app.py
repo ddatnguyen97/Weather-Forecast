@@ -9,6 +9,7 @@ filter_7d_df = filter_7d_data(weather_df)
 
 list_times_of_day = ['All'] + sorted(list(filter_7d_df['time_of_day'].unique()))
 list_month_day = ['All'] + sorted(list(filter_7d_df['month_day'].unique()))
+list_year = ['All'] + sorted(list(weather_df['year'].unique()))
 
 st.set_page_config(
     page_title="Weather Report",
@@ -29,7 +30,7 @@ st.markdown(
 
 st.image('../icon/hcmc-1.jpg', use_column_width=True)
 st.title('HCM City Weather Dashboard')
-tab1, tab2 = st.tabs(['7 Days Report', 'Future Prediction'])
+tab1, tab2, tab3 = st.tabs(['7 Days Report', 'Yearly Report', 'Future Prediction'])
 with tab1:
     with st.container():
         col1, col2 = st.columns([0.6, 0.4])
@@ -60,72 +61,102 @@ with tab1:
     avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
     sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
     wind_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['wind_speed_80m', 'wind_gusts_10m']].mean().reset_index()
-    rainfall_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['precipitation', 'rain', 'showers']].mean().reset_index()
+    rainfall_data_by_day = filter_7d_df.groupby(['month', 'day', 'month_day'])[['precipitation', 'rain', 'showers']].mean().reset_index()
 
-    temperature_chart = create_line_chart(avg_temp_by_day_hour, x='time', y='temperature_2m', title='Average Temperature by Hour', color='month_day')
-    sunshine_duration_chart = create_area_chart(sunshine_duration_by_day_hour, x='time', y='sunshine_duration', title='Average Sunshine Duration by Hour', color='month_day')
-    sunshine_duration_chart.update_layout(height=500)
-    wind_chart = create_line_chart(wind_data_by_day, x='time', y=['wind_speed_80m', 'wind_gusts_10m'], title='Wind Speed and Gust by Hour', color='month_day')
-    rainfall_chart = create_bar_chart(rainfall_data_by_day, x='time', y=['precipitation', 'rain', 'showers'], title='Rainfall by Hour', color='month_day')
+    temperature_chart = create_line_chart(avg_temp_by_day_hour,
+                                           x='time', 
+                                           y='temperature_2m', 
+                                           title='Average Temperature by Hour', 
+                                           color='month_day')
+    temperature_chart.update_layout(legend_title_text='Day of Month')
+
+    sunshine_duration_chart = create_area_chart(sunshine_duration_by_day_hour, 
+                                                x='time', 
+                                                y='sunshine_duration', 
+                                                title='Average Sunshine Duration by Hour', 
+                                                color='month_day')
+    sunshine_duration_chart.update_layout(height=500, legend_title_text='Day of Month')
+
+    wind_chart = create_line_chart(wind_data_by_day, 
+                                   x='time', 
+                                   y=['wind_speed_80m', 'wind_gusts_10m'], 
+                                   title='Wind Speed and Gust by Hour', 
+                                   color='month_day')
+    wind_chart.update_layout(legend_title_text='Day of Month')
+
+    rainfall_chart = create_bar_chart(rainfall_data_by_day, 
+                                      x='day', 
+                                      y=['precipitation', 'rain', 'showers'], 
+                                      title='Rainfall by Day', 
+                                      color='month_day')
+    rainfall_chart.update_layout(legend_title_text='Day of Month')
 
     avg_uv_index_chart = create_gauge_chart(metrics['avg_uv_index'], 'AVG UV Index (mW/cm2)')
     avg_uv_index_chart.update_layout(height=240)
     avg_uv_clear_sky_chart = create_gauge_chart(metrics['avg_uv_clear_sky'], 'AVG UV Index CS (mW/cm2)')
     avg_uv_clear_sky_chart.update_layout(height=240)
-    
+
     with st.container():
         st.subheader('Weather Metrics')
         with st.container():
             col1, col2, col3, col4 = st.columns(4)
             with col1:
-                overall_data_card = st.metric(label='Overall Weather', value=metrics['overall_weather'])
+                overall_data_card = st.metric(label='Overall Weather', 
+                                            value=metrics['overall_weather'])
 
             with col2:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/humidity.png', use_column_width=True)
                 with s_col2:
-                    avg_humidity_indicator = st.metric(label='Average Humidity', value=metrics['avg_humidity_f'])
+                    avg_humidity_indicator = st.metric(label='Average Humidity', 
+                                                    value=metrics['avg_humidity_f'])
 
             with col3:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/binoculars.png', use_column_width=True)
                 with s_col2:
-                    max_visibility_indicator = st.metric(label='Max Visibility', value=metrics['max_visibility_f'])
+                    max_visibility_indicator = st.metric(label='Max Visibility', 
+                                                        value=metrics['max_visibility_f'])
 
             with col4:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/clouds.png', use_column_width=True)
                 with s_col2:
-                    avg_cloud_cover_indicator = st.metric(label='Average Cloud Cover', value=metrics['avg_cloud_cover_f'])
+                    avg_cloud_cover_indicator = st.metric(label='Average Cloud Cover',
+                                                        value=metrics['avg_cloud_cover_f'])
 
         with st.container():
             col1, col2, col3, col4 = st.columns(4)
             with col1:            
-                comfort_index_card = st.metric(label='Comfort Index', value=metrics['comfort_index'])
+                comfort_index_card = st.metric(label='Comfort Index',
+                                            value=metrics['comfort_index'])
 
             with col2:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/drop.png', use_column_width=True)
                 with s_col2:
-                    dew_point_indicator = st.metric(label='Dew Point', value=metrics['avg_dew_point'])
+                    dew_point_indicator = st.metric(label='Dew Point',
+                                                    value=metrics['avg_dew_point'])
 
             with col3:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/evaporation.png', use_column_width=True)
                 with s_col2:
-                    evaporation_indicator = st.metric(label='Average Evaporation', value=metrics['avg_evapotranspiration'])
+                    evaporation_indicator = st.metric(label='Average Evaporation',
+                                                    value=metrics['avg_evapotranspiration'])
 
             with col4:
                 s_col1, s_col2 = st.columns([0.2, 0.8])
                 with s_col1:
                     st.image('../icon/water-vapor.png', use_column_width=True)
                 with s_col2:
-                    vapor_press_deficit_indicator = st.metric(label='Average Vapor Pressure Deficit', value=metrics['avg_vapour_pressure_deficit'])
+                    vapor_press_deficit_indicator = st.metric(label='Average Vapor Pressure Deficit', 
+                                                            value=metrics['avg_vapour_pressure_deficit'])
     
     st.divider()
     with st.container():
@@ -213,6 +244,39 @@ with tab1:
                 st.metric(label='Average Showers', value=metrics['avg_showers'])
         
         st.plotly_chart(rainfall_chart, use_container_width=True)
-        
 
 
+filter_year_df = filter_yearly_data(weather_df)
+filter_year_df['year'] = filter_year_df['year'].astype(str)
+with tab2:
+    with st.container():
+        col1, col2 = st.columns([0.6, 0.4])
+        with col1:
+            st.header('Yearly Weather Report')
+        with col2:
+            year_select_box = st.selectbox('Year', list_year)
+
+    if year_select_box != 'All':
+        filter_year_df = filter_year_df[filter_year_df['year'] == year_select_box]
+    
+    avg_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].mean().reset_index()
+    avg_rainfall_by_month = filter_year_df.groupby(['year', 'month','year_month'])[['precipitation', 'rain', 'showers']].mean().reset_index()
+
+    yearly_temperature_chart = create_line_chart(avg_temp_by_month,
+                                                x='month',
+                                                y='temperature_2m',
+                                                title='Average Temperature by Month',
+                                                color='year')
+    
+    yearly_rainfall_chart = create_bar_chart(avg_rainfall_by_month,
+                                            x='month',
+                                            y='precipitation',
+                                            title='Average Rainfall by Month',
+                                            color='year')
+    col1, col2 = st.columns([0.5, 0.5])
+    with col1:
+        st.subheader('Temperature Reports')
+        st.plotly_chart(yearly_temperature_chart, use_container_width=True)
+    with col2:
+        st.subheader('Rainfall Reports')
+        st.plotly_chart(yearly_rainfall_chart, use_container_width=True)

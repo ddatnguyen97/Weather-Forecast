@@ -35,3 +35,7 @@ def create_data_card(value, title):
 
     ))
     return fig
+
+def create_hist_chart(df, x, title, color=None):
+    fig = px.histogram(df, x=x, title=title, color=color)
+    return fig

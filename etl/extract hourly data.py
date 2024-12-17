@@ -17,7 +17,7 @@ openmeteo = openmeteo_requests.Client(session=retry_session)
 
 API_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-DATE_RANGE = {"start_date": "2022-01-01", "end_date": "2024-12-14"}
+DATE_RANGE = {"start_date": "2024-12-15", "end_date": "2024-12-16"}
 HOURLY_VARIABLES = [
         "temperature_2m",
         "relative_humidity_2m",

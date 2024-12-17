@@ -133,13 +133,22 @@ def get_comfort_index(dew_point):
 
 weather_df['date'] = pd.to_datetime(weather_df['date'])
 weather_df['month_day'] = weather_df['date'].dt.strftime('%m-%d')
+weather_df['year_month'] = weather_df['date'].dt.strftime('%Y-%m')
 weather_df['wind_direction'] = weather_df['wind_direction_80m'].apply(get_wind_direction)
 weather_df['comfort_index'] = weather_df['dew_point_2m'].apply(get_comfort_index)
 
-def filter_7d_data(df, days=6):
-    max_date = df['date'].max()
-    cutoff_date = max_date - pd.DateOffset(days=days)
-    return df[df['date'] >= cutoff_date]
+def filter_7d_data(df, day=None, offset=7):
+    if day is None:
+        current_date = pd.Timestamp.now().normalize() - pd.DateOffset(days=1)
+    else:
+        current_date = pd.Timestamp(day).normalize()
 
-filter_7d_df = filter_7d_data(weather_df)
+    cutoff_date = current_date - pd.DateOffset(days=offset)
+    return df[(df['date'] > cutoff_date) & (df['date'] <= current_date)]
 
+
+def filter_yearly_data(df, year=None):
+    if year is None:
+        return df  
+    else:
+        return df[df['year'] == year]
