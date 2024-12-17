@@ -35,17 +35,3 @@ def create_data_card(value, title):
 
     ))
     return fig
-
-temperature_chart = create_line_chart(avg_temp_by_day_hour, x='time', y='temperature_2m', title='Average Temperature by Hour', color='month_day')
-
-sunshine_duration_chart = create_area_chart(sunshine_duration_by_day_hour, x='time', y='sunshine_duration', title='Average Sunshine Duration by Hour', color='month_day')
-sunshine_duration_chart.update_layout(height=500)
-
-wind_chart = create_line_chart(wind_data_by_day, x='time', y=['wind_speed_80m', 'wind_gusts_10m'], title='Wind Speed and Gust by Hour', color='month_day')
-
-rainfall_chart = create_bar_chart(rainfall_data_by_day, x='time', y=['precipitation', 'rain', 'showers'], title='Rainfall by Hour', color='month_day')
-
-avg_uv_index_chart = create_gauge_chart(metrics['avg_uv_index'], 'AVG UV Index (mW/cm2)')
-avg_uv_index_chart.update_layout(height=240)
-avg_uv_clear_sky_chart = create_gauge_chart(metrics['avg_uv_clear_sky'], 'AVG UV Index CS (mW/cm2)')
-avg_uv_clear_sky_chart.update_layout(height=240)

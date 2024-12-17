@@ -143,7 +143,3 @@ def filter_7d_data(df, days=6):
 
 filter_7d_df = filter_7d_data(weather_df)
 
-avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
-sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
-wind_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['wind_speed_80m', 'wind_gusts_10m']].mean().reset_index()
-rainfall_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['precipitation', 'rain', 'showers']].mean().reset_index()

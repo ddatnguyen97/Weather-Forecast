@@ -5,6 +5,8 @@ from data import *
 from metrics import *
 from charts import *
 
+filter_7d_df = filter_7d_data(weather_df)
+
 list_times_of_day = ['All'] + sorted(list(filter_7d_df['time_of_day'].unique()))
 list_month_day = ['All'] + sorted(list(filter_7d_df['month_day'].unique()))
 
@@ -53,6 +55,24 @@ with tab1:
     if month_day_select_box != 'All':
         filter_7d_df = filter_7d_df[filter_7d_df['month_day'] == month_day_select_box]         
 
+    metrics = calculate_metrics(filter_7d_df)
+
+    avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
+    sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
+    wind_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['wind_speed_80m', 'wind_gusts_10m']].mean().reset_index()
+    rainfall_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['precipitation', 'rain', 'showers']].mean().reset_index()
+
+    temperature_chart = create_line_chart(avg_temp_by_day_hour, x='time', y='temperature_2m', title='Average Temperature by Hour', color='month_day')
+    sunshine_duration_chart = create_area_chart(sunshine_duration_by_day_hour, x='time', y='sunshine_duration', title='Average Sunshine Duration by Hour', color='month_day')
+    sunshine_duration_chart.update_layout(height=500)
+    wind_chart = create_line_chart(wind_data_by_day, x='time', y=['wind_speed_80m', 'wind_gusts_10m'], title='Wind Speed and Gust by Hour', color='month_day')
+    rainfall_chart = create_bar_chart(rainfall_data_by_day, x='time', y=['precipitation', 'rain', 'showers'], title='Rainfall by Hour', color='month_day')
+
+    avg_uv_index_chart = create_gauge_chart(metrics['avg_uv_index'], 'AVG UV Index (mW/cm2)')
+    avg_uv_index_chart.update_layout(height=240)
+    avg_uv_clear_sky_chart = create_gauge_chart(metrics['avg_uv_clear_sky'], 'AVG UV Index CS (mW/cm2)')
+    avg_uv_clear_sky_chart.update_layout(height=240)
+    
     with st.container():
         st.subheader('Weather Metrics')
         with st.container():

@@ -68,4 +68,3 @@ def calculate_metrics(df):
         "comfort_index": comfort_level,
     }
 
-metrics = calculate_metrics(filter_7d_df)
