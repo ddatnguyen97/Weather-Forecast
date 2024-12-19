@@ -26,7 +26,7 @@ def calculate_metrics(df):
     max_temp = calculate_max(df, 'temperature_2m')
     min_temp = calculate_min(df, 'temperature_2m')
     avg_temp = calculate_avg(df, 'temperature_2m')
-    wind_speed = calculate_avg(df, 'wind_speed_80m')
+    wind_speed = calculate_avg(df, 'wind_speed_10m')
     wind_gust = calculate_avg(df, 'wind_gusts_10m')
     overall_wind_direction = calculate_mode(df, 'wind_direction')
     avg_uv_index = calculate_avg(df, 'uv_index')
@@ -51,8 +51,8 @@ def calculate_metrics(df):
         "max_temp_f": f'{max_temp:.2f}°C',
         "min_temp_f": f'{min_temp:.2f}°C',
         "avg_temp_f": f'{avg_temp:.2f}°C',
-        "wind_speed_f": f'{wind_speed:.2f} m/s',
-        "wind_gust_f": f'{wind_gust:.2f} m/s',
+        "wind_speed_f": f'{wind_speed:.2f} km/h',
+        "wind_gust_f": f'{wind_gust:.2f} km/h',
         "overall_wind_direction": overall_wind_direction,
         "avg_uv_index": avg_uv_index,
         "avg_uv_clear_sky": avg_uv_clear_sky,

@@ -67,7 +67,7 @@ query = text("""
         tod.name as time_of_day,
         wc.name as weather_code_name   
     from
-        hourly_data hw 
+        hourly_weather_data hw 
     join
         dim_date dd on hw.date_id = dd.id
     join
@@ -91,7 +91,7 @@ numeric_columns = [
     'temperature_2m', 'relative_humidity_2m', 'dew_point_2m', 'apparent_temperature',
     'precipitation_probability', 'precipitation', 'rain', 'showers', 'pressure_msl', 'surface_pressure',
     'cloud_cover', 'visibility', 'evapotranspiration', 'vapour_pressure_deficit', 
-    'wind_speed_80m', 'wind_direction_80m', 'wind_gusts_10m', 
+    'wind_speed_10m', 'wind_direction_10m', 'wind_gusts_10m', 
     'uv_index', 'uv_index_clear_sky', 'sunshine_duration'
 ]
 for col in numeric_columns:
@@ -134,7 +134,7 @@ def get_comfort_index(dew_point):
 weather_df['date'] = pd.to_datetime(weather_df['date'])
 weather_df['month_day'] = weather_df['date'].dt.strftime('%m-%d')
 weather_df['year_month'] = weather_df['date'].dt.strftime('%Y-%m')
-weather_df['wind_direction'] = weather_df['wind_direction_80m'].apply(get_wind_direction)
+weather_df['wind_direction'] = weather_df['wind_direction_10m'].apply(get_wind_direction)
 weather_df['comfort_index'] = weather_df['dew_point_2m'].apply(get_comfort_index)
 
 def filter_7d_data(df, day=None, offset=7):
