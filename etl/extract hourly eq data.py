@@ -16,9 +16,12 @@ cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
 retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
 openmeteo = openmeteo_requests.Client(session = retry_session)
 
+start_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y-%m-%d')
+end_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y-%m-%d')
+
 API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-DATE_RANGE = {"start_date": "2022-01-01", "end_date": "2024-12-18"}
+DATE_RANGE = {"start_date": start_date, "end_date": end_date}
 HOURLY_VARIABLES = [
     "pm10", 
     "pm2_5", 
@@ -121,4 +124,3 @@ def execute_pipeline(table_name):
 if __name__ == '__main__':
     table_name = 'hourly_aq_data'
     df = execute_pipeline(table_name)
-    print(df.shape)

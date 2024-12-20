@@ -16,9 +16,12 @@ cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
 retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
 openmeteo = openmeteo_requests.Client(session=retry_session)
 
+start_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y-%m-%d')
+end_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y-%m-%d')
+
 API_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-DATE_RANGE = {"start_date": "2022-01-01", "end_date": "2024-12-18"}
+DATE_RANGE = {"start_date": start_date, "end_date": end_date}
 HOURLY_VARIABLES = [
         "temperature_2m",
         "relative_humidity_2m",

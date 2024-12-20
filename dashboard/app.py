@@ -29,8 +29,8 @@ st.markdown(
 )
 
 st.image('../icon/hcmc-1.jpg', use_column_width=True)
-st.title('HCM City Weather Dashboard')
-tab1, tab2, tab3 = st.tabs(['7 Days Report', 'Yearly Report', 'Future Prediction'])
+st.title('HCM City Weather Report')
+tab1, tab2, tab3, tab4 = st.tabs(['7 Days Report', 'Monthly Report', 'Air Quality', 'Future Prediction',])
 with tab1:
     with st.container():
         col1, col2 = st.columns([0.6, 0.4])
@@ -61,7 +61,7 @@ with tab1:
     avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
     sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
     wind_data_by_day = filter_7d_df.groupby(['month_day', 'time'])[['wind_speed_10m', 'wind_gusts_10m']].mean().reset_index()
-    rainfall_data_by_day = filter_7d_df.groupby(['month', 'day', 'month_day'])[['precipitation', 'rain', 'showers']].mean().reset_index()
+    rainfall_by_day = filter_7d_df.groupby(['month', 'day', 'month_day'])['precipitation'].mean().reset_index()
 
     temperature_chart = create_line_chart(avg_temp_by_day_hour,
                                            x='time', 
@@ -84,9 +84,9 @@ with tab1:
                                    color='month_day')
     wind_chart.update_layout(legend_title_text='Day of Month')
 
-    rainfall_chart = create_bar_chart(rainfall_data_by_day, 
+    rainfall_chart = create_bar_chart(rainfall_by_day, 
                                       x='day', 
-                                      y=['precipitation', 'rain', 'showers'], 
+                                      y='precipitation', 
                                       title='Rainfall by Day', 
                                       color='month_day')
     rainfall_chart.update_layout(legend_title_text='Day of Month')
@@ -245,8 +245,9 @@ with tab1:
         
         st.plotly_chart(rainfall_chart, use_container_width=True)
 
-filter_year_df = filter_yearly_data(weather_df)
+filter_year_df = filter_5y_data(weather_df)
 filter_year_df['year'] = filter_year_df['year'].astype(str)
+
 with tab2:
     with st.container():
         col1, col2 = st.columns([0.8, 0.2])
@@ -256,27 +257,61 @@ with tab2:
             year_select_box = st.selectbox('Year', list_year)
 
     if year_select_box != 'All':
-        filter_year_df = filter_year_df[filter_year_df['year'] == year_select_box]
-    
-    avg_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].mean().reset_index()
-    avg_rainfall_by_month = filter_year_df.groupby(['year', 'month','year_month'])[['precipitation', 'rain', 'showers']].mean().reset_index()
+        filter_year_df = filter_year_df[filter_year_df['year'] == str(year_select_box)]
 
-    monthy_avg_temperature_chart = create_line_chart(avg_temp_by_month,
+        avg_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].mean().reset_index()
+        max_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].max().reset_index()
+        min_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].min().reset_index()
+        avg_rainfall_by_month = filter_year_df.groupby(['year', 'month','year_month'])[['precipitation']].mean().reset_index()
+
+        temp_metrics_by_month = create_combine_chart([avg_temp_by_month, max_temp_by_month, min_temp_by_month],
+                                                    ['Average Temp', 'Max Temp', 'Min Temp'],
+                                                    'month',
+                                                    ['temperature_2m', 'temperature_2m', 'temperature_2m'],
+                                                    'Temperature Metrics by Month',
+                                                    'Month',
+                                                    'Temperature (°C)',
+                                                    ['bar', 'bar', 'bar'],
+                                                    colors=['#1f77b4', '#ff7f0e', '#2ca02c'])
+
+        rainfall_by_month = create_bar_chart(avg_rainfall_by_month,
                                                 x='month',
-                                                y='temperature_2m',
-                                                title='Average Temperature by Month',
+                                                y='precipitation',
+                                                title='Average Rainfall by Month',
                                                 color='year')
-    
-    monthly_rainfall_chart = create_bar_chart(avg_rainfall_by_month,
-                                            x='month',
+        rainfall_by_month.update_layout(barmode='group')
+        
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1:
+            st.subheader('Temperature Reports')
+            st.plotly_chart(temp_metrics_by_month, use_container_width=True)
+        with col2:
+            st.subheader('Rainfall Reports')
+            st.plotly_chart(rainfall_by_month, use_container_width=True)
+
+    else:
+        avg_temp_by_year = filter_year_df.groupby(['year'])['temperature_2m'].mean().reset_index()
+        avg_rainfall_by_year = filter_year_df.groupby(['year'])['precipitation'].mean().reset_index()
+        
+        temp_metrics_by_year = create_bar_chart(avg_temp_by_year,
+                                                x='year',
+                                                y='temperature_2m',
+                                                title='Average Temperature by Year',
+                                                color='year')
+        temp_metrics_by_year.update_layout(xaxis=dict(type='category'))
+
+        rainfall_by_year = create_bar_chart(avg_rainfall_by_year,
+                                            x='year',
                                             y='precipitation',
-                                            title='Average Rainfall by Month',
+                                            title='Average Rainfall by Year',
                                             color='year')
-    monthly_rainfall_chart.update_layout(barmode='group')
-    col1, col2 = st.columns([0.5, 0.5])
-    with col1:
-        st.subheader('Temperature Reports')
-        st.plotly_chart(monthy_avg_temperature_chart, use_container_width=True)
-    with col2:
-        st.subheader('Rainfall Reports')
-        st.plotly_chart(monthly_rainfall_chart, use_container_width=True)
+        rainfall_by_year.update_layout(xaxis=dict(type='category'))
+        col1, col2 = st.columns([0.5, 0.5])
+        with col1:
+            st.subheader('Temperature Reports')
+            st.plotly_chart(temp_metrics_by_year, use_container_width=True)
+        with col2:
+            st.subheader('Rainfall Reports')
+            st.plotly_chart(rainfall_by_year, use_container_width=True)
+        
+    

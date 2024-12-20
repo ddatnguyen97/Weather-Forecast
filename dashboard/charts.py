@@ -39,3 +39,32 @@ def create_data_card(value, title):
 def create_hist_chart(df, x, title, color=None):
     fig = px.histogram(df, x=x, title=title, color=color)
     return fig
+
+def create_choropleth_map(df, lat, lon, color, title=None):
+    fig = px.choropleth(df,
+        lat=lat,
+        lon=lon,
+        color=color,
+        title=title)
+    return fig
+
+def create_combine_chart(datasets, labels, x_column, y_column, title, x_title, y_title, chart_types, colors=None):
+    fig = go.Figure()
+    for i, dataset in enumerate(datasets):
+        if chart_types[i] == 'line':
+            fig.add_trace(go.Scatter(
+            x=dataset[x_column],
+            y=dataset[y_column[i]],
+            name=labels[i], 
+            mode=None, 
+            line=dict(color=colors[i])
+            ))
+        elif chart_types[i] == 'bar':
+            fig.add_trace(go.Bar(
+            x=dataset[x_column],
+            y=dataset[y_column[i]],
+            name=labels[i],
+            marker_color=colors[i]
+            ))
+    fig.update_layout(title=title, xaxis_title=x_title, yaxis_title=y_title)
+    return fig
