@@ -21,10 +21,10 @@ def extract_data(file_path, sheet_name):
         df = pd.read_excel(file_path, sheet_name, engine='openpyxl')
         logging.info(f'{file_path} has been read successfully.')
         return df
-    
     except Exception as e:
         logging.error(f'An error occurred: {str(e)}')
         return None
+
 
 def transform_data(df):
     try:

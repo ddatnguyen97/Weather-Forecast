@@ -21,7 +21,8 @@ end_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y
 
 API_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-DATE_RANGE = {"start_date": start_date, "end_date": end_date}
+# DATE_RANGE = {"start_date": start_date, "end_date": end_date}
+DATE_RANGE = {"start_date": '2022-01-01', "end_date": '2024-12-24'}
 HOURLY_VARIABLES = [
         "temperature_2m",
         "relative_humidity_2m",
@@ -47,15 +48,6 @@ HOURLY_VARIABLES = [
         "sunshine_duration",
     ]
 # TIME_ZONE = "Auto"
-
-db_config = {
-    'username': os.getenv('DB_USER'),
-    'password': os.getenv('DB_PASSWORD'),
-    'host': os.getenv('DB_HOST'),
-    'port': os.getenv('DB_PORT'),
-    'db_name': os.getenv('DB_NAME')
-}
-connection_string = f"postgresql://{db_config['username']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
 
 def fetch_weather_data():
     try:
@@ -119,27 +111,44 @@ def insert_on_conflict_nothing(table, conn, keys, data_iter):
         logging.error(f'error during insert: {e}')
         raise
 
-def load_data_to_dw(df, table_name, method=insert_on_conflict_nothing):
+def load_data_to_dw(df, table_name, connection_string, method=insert_on_conflict_nothing):
     try:
         engine = create_engine(connection_string)
-        df.to_sql(table_name, con=engine, index=False, if_exists='append', method=method)
+
+        with engine.connect() as connection:
+            df.to_sql(
+                table_name,
+                con=connection,
+                index=False,
+                if_exists='append',
+                method=method  
+            )
         logging.info(f"Loaded {df.shape[0]} rows into table '{table_name}'.")
     except Exception as e:
         logging.error(f"Error loading data to database: {str(e)}")
         raise
 
-def execute_pipeline(table_name):
+def execute_pipeline(table_name, connection_string):
     try:
         logging.info("Pipeline execution started.")
         response = fetch_weather_data()
         df = extract_data(response)
         df = transform_data(df)
-        load_data_to_dw(df, table_name)
+        load_data_to_dw(df, table_name, connection_string)
         logging.info("Pipeline execution completed successfully.")
     except Exception as e:
         logging.error(f"Pipeline failed: {str(e)}")
         raise
 
 if __name__ == '__main__':
+
+    db_config = {
+    'username': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'host': os.getenv('DB_HOST'),
+    'port': os.getenv('DB_PORT'),
+    'db_name': os.getenv('DB_NAME')
+}
+    connection_string = f"postgresql://{db_config['username']}:{db_config['password']}@{db_config['host']}:{db_config['port']}/{db_config['db_name']}"
     table_name = 'hourly_weather_data'
-    df = execute_pipeline(table_name)
+    df = execute_pipeline(table_name, connection_string)

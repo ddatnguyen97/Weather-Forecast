@@ -1,6 +1,7 @@
 import pandas as pd
 import logging
 from sqlalchemy import create_engine
+from pytz import timezone
 import os
 from dotenv import load_dotenv
 
@@ -30,17 +31,33 @@ def get_time(st, et):
         logging.error(f'error: {e}')
         raise
 
-def transform_data(df):
+# def transform_data(df):
+#     try:
+#         df['id'] = df['time'].dt.strftime('%H%M').astype(str)
+#         df['hour'] = df['time'].dt.hour
+#         df['id'] = df['id'].str.zfill(4)
+#         df = df.drop_duplicates()
+#         logging.info(f'dropped duplicates: {df.shape[0]} rows')
+#         return df
+    
+#     except Exception as e:
+#         logging.error(f'error: {e}')
+#         raise
+
+def transform_data(df, target_timezone='UTC'):
     try:
+        if not pd.api.types.is_datetime64_any_dtype(df['time']):
+            df['time'] = pd.to_datetime(df['time'])
+        
+        tz = timezone(target_timezone)
+        df['time'] = df['time'].dt.tz_localize(tz)
         df['id'] = df['time'].dt.strftime('%H%M').astype(str)
         df['hour'] = df['time'].dt.hour
-        df['id'] = df['id'].apply(lambda x: '0' + x if len(x) == 3 else x)
-        df['id'] = df['id'].apply(lambda x: '00' + x if len(x) == 2 else x)
-        df['id'] = df['id'].apply(lambda x: '000' + x if len(x) == 1 else x)
+
+        df['id'] = df['id'].str.zfill(4)
         df = df.drop_duplicates()
         logging.info(f'dropped duplicates: {df.shape[0]} rows')
         return df
-    
     except Exception as e:
         logging.error(f'error: {e}')
         raise

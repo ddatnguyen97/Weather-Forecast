@@ -314,4 +314,12 @@ with tab2:
             st.subheader('Rainfall Reports')
             st.plotly_chart(rainfall_by_year, use_container_width=True)
         
-    
+with tab3:
+    with st.container():
+        st.header('Air Quality Report')
+        st.write('Coming soon ...')
+            
+with tab4:
+    with st.container():
+        st.header('Future Prediction Report')
+        st.write('Coming soon ...')

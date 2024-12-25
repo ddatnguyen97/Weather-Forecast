@@ -148,13 +148,6 @@ def filter_7d_data(df, day=None, offset=7):
 
 
 def filter_5y_data(df, year='year', offset=5):
-    # if year is None:
-    #     current_year = pd.Timestamp.now().year  
-    # else:
-    #     current_year = year
-
-    # cutoff_year = current_year - pd.DateOffset(years=offset)
-    # return df[df['year'] > cutoff_year & (df['year'] <= current_year)]
     current_year = pd.Timestamp.now().year
     cutoff_year = max(df[year].min(), current_year - offset)
     return df[df[year] >= cutoff_year]
