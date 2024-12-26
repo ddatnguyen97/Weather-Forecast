@@ -4,12 +4,15 @@ import pandas as pd
 from data import *
 from metrics import *
 from charts import *
+from filters import *
 
 filter_7d_df = filter_7d_data(weather_df)
 
-list_times_of_day = ['All'] + sorted(list(filter_7d_df['time_of_day'].unique()))
-list_month_day = ['All'] + sorted(list(filter_7d_df['month_day'].unique()))
-list_year = ['All'] + sorted(list(weather_df['year'].unique()))
+unique_wt_times_of_day = sorted(filter_7d_df['time_of_day'].unique())
+unique_wt_month_day = sorted(filter_7d_df['month_day'].unique())
+
+list_times_of_day_wt = ['All'] + unique_wt_times_of_day
+list_month_day_wt = ['All'] + unique_wt_month_day
 
 st.set_page_config(
     page_title="Weather Report",
@@ -21,7 +24,7 @@ st.markdown(
     """
     <style>
     .stApp {
-        background-color: #2F3030;  /* Change this to your desired background color */
+        background-color: #2F3030;
     }
     </style>
     """,
@@ -39,24 +42,21 @@ with tab1:
         with col2:
             s_col1, s_col2, s_col3 = st.columns([0.2, 0.4, 0.4])
             with s_col2:
-                tod_select_box = st.selectbox('Times of Day', list_times_of_day)
+                wt_tod_select_box = st.selectbox('Times of Day', list_times_of_day_wt)
             with s_col3:
-                month_day_select_box = st.selectbox('Date (recent 7 days)', list_month_day)
+                wt_month_day_select_box = st.selectbox('Date (recent 7 days)', list_month_day_wt)
             with s_col1:
-                if tod_select_box == 'Day':
-                    st.image('../icon/sun.png', use_column_width=True)
-                elif tod_select_box == 'Night':
-                    st.image('../icon/full-moon.png', use_column_width=True)
-                else:
-                    st.image('../icon/day-and-night.png', use_column_width=True)
+                image_map = {
+                    'Day': '../icon/sun.png',
+                    'Night': '../icon/full-moon.png',
+                    'All': '../icon/day-and-night.png'
+                }
+                st.image(image_map.get(wt_tod_select_box, '../icon/day-and-night.png'), use_column_width=True)
                 
-    if tod_select_box != 'All':
-        filter_7d_df = filter_7d_df[filter_7d_df['time_of_day'] == tod_select_box]   
+    filter_7d_df = filter_column(filter_7d_df, 'time_of_day', wt_tod_select_box)
+    filter_7d_df = filter_column(filter_7d_df, 'month_day', wt_month_day_select_box)         
 
-    if month_day_select_box != 'All':
-        filter_7d_df = filter_7d_df[filter_7d_df['month_day'] == month_day_select_box]         
-
-    metrics = calculate_metrics(filter_7d_df)
+    metrics = calculate_wt_metrics(filter_7d_df)
 
     avg_temp_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['temperature_2m'].mean().reset_index()
     sunshine_duration_by_day_hour = filter_7d_df.groupby(['month_day', 'time'])['sunshine_duration'].mean().reset_index()
@@ -245,8 +245,11 @@ with tab1:
         
         st.plotly_chart(rainfall_chart, use_container_width=True)
 
-filter_year_df = filter_5y_data(weather_df)
-filter_year_df['year'] = filter_year_df['year'].astype(str)
+filter_5year_df = filter_5y_data(weather_df)
+filter_5year_df['year'] = filter_5year_df['year'].astype(str)
+
+unique_wt_year = sorted(filter_5year_df['year'].unique())
+list_year_wt = ['All'] + unique_wt_year
 
 with tab2:
     with st.container():
@@ -254,15 +257,14 @@ with tab2:
         with col1:
             st.header('Monthly Weather Report')
         with col2:
-            year_select_box = st.selectbox('Year', list_year)
-
+            year_select_box = st.selectbox('Year', list_year_wt)
+    filter_wt_year_df = filter_column(filter_5year_df, 'year', year_select_box)
+    
     if year_select_box != 'All':
-        filter_year_df = filter_year_df[filter_year_df['year'] == str(year_select_box)]
-
-        avg_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].mean().reset_index()
-        max_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].max().reset_index()
-        min_temp_by_month = filter_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].min().reset_index()
-        avg_rainfall_by_month = filter_year_df.groupby(['year', 'month','year_month'])[['precipitation']].mean().reset_index()
+        avg_temp_by_month = filter_wt_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].mean().reset_index()
+        max_temp_by_month = filter_wt_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].max().reset_index()
+        min_temp_by_month = filter_wt_year_df.groupby(['month', 'year', 'year_month'])['temperature_2m'].min().reset_index()
+        avg_rainfall_by_month = filter_wt_year_df.groupby(['year', 'month','year_month'])[['precipitation']].mean().reset_index()
 
         temp_metrics_by_month = create_combine_chart([avg_temp_by_month, max_temp_by_month, min_temp_by_month],
                                                     ['Average Temp', 'Max Temp', 'Min Temp'],
@@ -290,8 +292,8 @@ with tab2:
             st.plotly_chart(rainfall_by_month, use_container_width=True)
 
     else:
-        avg_temp_by_year = filter_year_df.groupby(['year'])['temperature_2m'].mean().reset_index()
-        avg_rainfall_by_year = filter_year_df.groupby(['year'])['precipitation'].mean().reset_index()
+        avg_temp_by_year = filter_wt_year_df.groupby(['year'])['temperature_2m'].mean().reset_index()
+        avg_rainfall_by_year = filter_wt_year_df.groupby(['year'])['precipitation'].mean().reset_index()
         
         temp_metrics_by_year = create_bar_chart(avg_temp_by_year,
                                                 x='year',
@@ -313,11 +315,19 @@ with tab2:
         with col2:
             st.subheader('Rainfall Reports')
             st.plotly_chart(rainfall_by_year, use_container_width=True)
-        
+
+# aq_7d_df = filter_7d_data(aq_df)
+# list_times_of_day_aq = ['All'] + sorted(list(aq_7d_df['time'].unique()))
+# list_month_day_aq = ['All'] + sorted(list(aq_7d_df['month_day'].unique()))
+
 with tab3:
     with st.container():
-        st.header('Air Quality Report')
-        st.write('Coming soon ...')
+        # st.write('Coming soon ...')
+        col1, col2 = st.columns([0.8, 0.2])
+        with col1:
+            st.header('Air Quality Report')
+        # with col2:
+            # aq_times_of_day = st.selectbox('Times of day', list_times_of_day_aq)
             
 with tab4:
     with st.container():

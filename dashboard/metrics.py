@@ -19,7 +19,7 @@ def calculate_mode(df, column):
     mode = df[column].mode()
     return mode[0]
 
-def calculate_metrics(df):
+def calculate_wt_metrics(df):
     overall_weather = calculate_mode(df, 'weather_code_name')
     avg_cloud_cover = calculate_avg(df, 'cloud_cover')
     max_visibility = calculate_max(df, 'visibility')
@@ -68,3 +68,19 @@ def calculate_metrics(df):
         "comfort_index": comfort_level,
     }
 
+def calculate_aq_metrics(df):
+    avg_particulate_matter_2_5 = calculate_avg(df, 'pm2_5')
+    avg_particulate_matter_10 = calculate_avg(df, 'pm10')
+    avg_co = calculate_avg(df, 'carbon_monoxide')
+    avg_no2 = calculate_avg(df, 'nitrogen_dioxide')
+    avg_so2 = calculate_avg(df, 'sulfur_dioxide')
+    avg_oz = calculate_avg(df, 'ozone')
+
+    return {
+        "avg_particulate_matter_2_5": f'{avg_particulate_matter_2_5:.2f} µg/m³',
+        "avg_particulate_matter_10": f'{avg_particulate_matter_10:.2f} µg/m³',
+        "avg_co": f'{avg_co:.2f} mg/m³',
+        "avg_no2": f'{avg_no2:.2f} µg/m³',
+        "avg_so2": f'{avg_so2:.2f} µg/m³',
+        "avg_oz": f'{avg_oz:.2f} µg/m³',
+    }

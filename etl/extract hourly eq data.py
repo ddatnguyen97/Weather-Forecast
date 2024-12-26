@@ -21,8 +21,8 @@ end_date = (pd.Timestamp.now().normalize() - pd.DateOffset(days=1)).strftime('%Y
 
 API_URL = "https://air-quality-api.open-meteo.com/v1/air-quality"
 LOCATION = {"latitude": 10.8231, "longitude": 106.6297}
-# DATE_RANGE = {"start_date": start_date, "end_date": end_date}
-DATE_RANGE = {"start_date": '2022-01-01', "end_date": '2024-12-24'}
+DATE_RANGE = {"start_date": start_date, "end_date": end_date}
+# DATE_RANGE = {"start_date": '2022-01-01', "end_date": '2024-12-24'}
 
 HOURLY_VARIABLES = [
     "pm10", 
