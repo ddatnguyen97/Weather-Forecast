@@ -31,19 +31,6 @@ def get_time(st, et):
         logging.error(f'error: {e}')
         raise
 
-# def transform_data(df):
-#     try:
-#         df['id'] = df['time'].dt.strftime('%H%M').astype(str)
-#         df['hour'] = df['time'].dt.hour
-#         df['id'] = df['id'].str.zfill(4)
-#         df = df.drop_duplicates()
-#         logging.info(f'dropped duplicates: {df.shape[0]} rows')
-#         return df
-    
-#     except Exception as e:
-#         logging.error(f'error: {e}')
-#         raise
-
 def transform_data(df, target_timezone='UTC'):
     try:
         if not pd.api.types.is_datetime64_any_dtype(df['time']):

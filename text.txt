@@ -1,8 +1,8 @@
 Nhóm	                    	Cột
-Thời gian	                date_id, time_id, id
-Ánh sáng và bức xạ	        sunshine_duration, uv_index, uv_index_clear_sky
-Gió	                        wind_speed_80m, wind_direction_80m, wind_gusts_10m
-Nhiệt độ và độ ẩm	        temperature_2m, relative_humidity_2m, dew_point_2m
+Thời gian	                    date_id, time_id, id
+Ánh sáng và bức xạ	            sunshine_duration, uv_index, uv_index_clear_sky
+Gió	                            wind_speed_80m, wind_direction_80m, wind_gusts_10m
+Nhiệt độ và độ ẩm	            temperature_2m, relative_humidity_2m, dew_point_2m
 Lượng mưa và hơi nước	    	precipitation_probability, precipitation, rain, showers, vapour_pressure_deficit, evapotranspiration
 Áp suất	                    	pressure_msl, surface_pressure
 Độ che phủ, tầm nhìn	    	cloud_cover, visibility

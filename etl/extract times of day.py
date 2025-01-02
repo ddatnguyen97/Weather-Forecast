@@ -25,7 +25,6 @@ def extract_data(file_path, sheet_name):
         logging.error(f'An error occurred: {str(e)}')
         return None
 
-
 def transform_data(df):
     try:
         df['id'] = df['id'].astype(str)

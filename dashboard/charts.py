@@ -68,3 +68,23 @@ def create_combine_chart(datasets, labels, x_column, y_column, title, x_title, y
             ))
     fig.update_layout(title=title, xaxis_title=x_title, yaxis_title=y_title)
     return fig
+
+def create_choropleth_map(df, geojson, locations, color, title=None):
+    fig = px.choropleth(df,
+        geojson=geojson,
+        locations=locations,
+        color=color,
+        title=title)
+    return fig
+
+def create_mapbox_map(df, lat, lon, color, title=None):
+    fig = px.scatter_mapbox(
+        df,
+        lat=lat,
+        lon=lon,
+        color=color,
+        title=title,
+        mapbox_style="carto-positron",
+        zoom=10
+    )
+    return fig

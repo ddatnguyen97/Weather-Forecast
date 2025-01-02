@@ -65,7 +65,10 @@ weather_query = text("""
         dd.day,
         dt.time,
         tod.name as time_of_day,
-        wc.name as weather_code_name   
+        wc.name as weather_code_name,
+        dl.lat,
+        dl.lon,
+        dl.name as location_name
     from
         hourly_weather_data hw 
     join
@@ -76,6 +79,8 @@ weather_query = text("""
         times_of_day tod on hw.is_day = tod.id
     join
         weather_code wc on hw.weather_code = wc.id
+    join
+        dim_location dl on hw.location_id = dl.id                 
         """)
 
 weather_columns_to_drop = ['id',
@@ -83,6 +88,7 @@ weather_columns_to_drop = ['id',
                     'time_id',
                     'is_day',
                     'weather_code',
+                    'location_id',
                     ]
 
 weather_df = execute_data(weather_query, weather_columns_to_drop)
@@ -159,21 +165,28 @@ aq_query = text("""
         dd.year,
         dd.month,
         dd.day,
-        dt.time   
+        dt.time,
+        dl.lat,
+        dl.lon,
+        dl.name as location_name
     from
         hourly_aq_data ha 
     join
         dim_date dd on ha.date_id = dd.id
     join
         dim_time dt on ha.time_id = dt.id
+    join 
+        dim_location dl on ha.location_id = dl.id
     """)
 
 aq_columns_to_drop = [
     'id',
     'date_id',
     'time_id',
+    'location_id',
 ]
 aq_df = execute_data(aq_query, aq_columns_to_drop)
+# print(aq_df.head())
 
 aq_numeric_columns = [
     'pm2_5', 'pm10', 'carbon_monoxide', 'nitrogen_dioxide', 'sulphur_dioxide', 'ozone'

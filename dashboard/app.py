@@ -5,11 +5,12 @@ from data import *
 from metrics import *
 from charts import *
 from filters import *
+from utils import *
 
 filter_7d_df = filter_7d_data(weather_df)
 
-unique_wt_times_of_day = sorted(filter_7d_df['time_of_day'].unique())
-unique_wt_month_day = sorted(filter_7d_df['month_day'].unique())
+unique_wt_times_of_day = get_unique_sorted_list(filter_7d_df, 'time_of_day')
+unique_wt_month_day = get_unique_sorted_list(filter_7d_df, 'month_day')
 
 list_times_of_day_wt = ['All'] + unique_wt_times_of_day
 list_month_day_wt = ['All'] + unique_wt_month_day
@@ -248,7 +249,7 @@ with tab1:
 filter_5year_df = filter_5y_data(weather_df)
 filter_5year_df['year'] = filter_5year_df['year'].astype(str)
 
-unique_wt_year = sorted(filter_5year_df['year'].unique())
+unique_wt_year = get_unique_sorted_list(filter_5year_df, 'year', ascending=True)
 list_year_wt = ['All'] + unique_wt_year
 
 with tab2:
@@ -316,9 +317,10 @@ with tab2:
             st.subheader('Rainfall Reports')
             st.plotly_chart(rainfall_by_year, use_container_width=True)
 
-# aq_7d_df = filter_7d_data(aq_df)
-# list_times_of_day_aq = ['All'] + sorted(list(aq_7d_df['time'].unique()))
-# list_month_day_aq = ['All'] + sorted(list(aq_7d_df['month_day'].unique()))
+aq_7d_df = filter_7d_data(aq_df)
+
+# list_times_of_day_aq = ['All'] + get_unique_sorted_list(aq_7d_df, 'times_of_day')
+list_month_day_aq = ['All'] + get_unique_sorted_list(aq_7d_df, 'month_day')
 
 with tab3:
     with st.container():
@@ -328,6 +330,14 @@ with tab3:
             st.header('Air Quality Report')
         # with col2:
             # aq_times_of_day = st.selectbox('Times of day', list_times_of_day_aq)
+    
+    with st.container():
+        hcm_map = create_choropleth_map(aq_7d_df, hcm_geojson, 'location_name', 'pm2_5', 'PM2.5 AQI')
+        hcm_map.update_layout(
+        mapbox=dict(
+            center=dict(lat=10.8231, lon=106.6297),
+        ))
+        st.plotly_chart(hcm_map, use_container_width=True)
             
 with tab4:
     with st.container():
